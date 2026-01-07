@@ -1,0 +1,276 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Admin Dashboard | INTI{% endblock %}
+
+{% block content %}
+    <div style="text-align: right; margin-bottom: 20px;">
+        <a href="{{ url_for('admin_logout') }}" class="logout-link">Logout</a>
+    </div>
+    <h2>{% if view == 'users' %}User List{% elif view == 'groups' %}Group List{% else %}Admin Dashboard{% endif %}</h2>
+    
+    {% if view == 'dashboard' %}
+    <div class="admin-stats">
+        <h3>System Statistics</h3>
+        <p>Total Users: {{ users|length }}</p>
+        <p>Total Study Groups: {{ groups|length }}</p>
+    </div>
+    {% endif %}
+    
+    {% if view == 'groups' or view == 'dashboard' %}
+    <div class="admin-section">
+        <h3>Study Groups</h3>
+        {% if groups %}
+            <div class="table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Subject</th>
+                            <th>Goal</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Location</th>
+                            <th>Members</th>
+                            <th>Created By</th>
+                            <th>Created At</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for group in groups %}
+                        <tr>
+                            <td>{{ group.id }}</td>
+                            <td>{{ group.name }}</td>
+                            <td>{{ group.subject }}</td>
+                            <td>{{ group.goal }}</td>
+                            <td>{{ group.date }}</td>
+                            <td>{{ group.time }}</td>
+                            <td>{{ group.location }}</td>
+                            <td>{{ group.current_members }}/{{ group.max_members }}</td>
+                            <td>{{ group.created_by }}</td>
+                            <td>{{ group.created_at }}</td>
+                            <td>
+                                <button class="delete-group-btn" data-group-id="{{ group.id }}" data-group-name="{{ group.name }}">Delete</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p>No study groups found.</p>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    {% if view == 'users' or view == 'dashboard' %}
+    <div class="admin-section">
+        <h3>Users</h3>
+        {% if users %}
+            <div class="table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Student ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Is Admin</th>
+                            <th>Created At</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>{{ user.id }}</td>
+                            <td>{{ user.student_id }}</td>
+                            <td>{{ user.name }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ 'Yes' if user.is_admin else 'No' }}</td>
+                            <td>{{ user.created_at }}</td>
+                            <td>
+                                {% if not user.is_admin %}
+                                    <button class="delete-user-btn" data-user-id="{{ user.id }}" data-user-name="{{ user.name }}">Delete</button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p>No users found.</p>
+        {% endif %}
+    </div>
+    {% endif %}
+{% endblock %}
+
+{% block scripts %}
+    <style>
+        .admin-stats {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .admin-section {
+            margin-bottom: 30px;
+        }
+        
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        
+        .admin-table th,
+        .admin-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        .admin-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        
+        .admin-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        /* Scrollable table containers */
+        .table-container {
+            max-height: 400px;
+            overflow-y: auto;
+            overflow-x: auto;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .table-container thead th {
+            position: sticky;
+            top: 0;
+            background-color: #f2f2f2;
+            z-index: 10;
+        }
+        
+        /* Ensure table header columns stay aligned when scrolling horizontally */
+        .admin-table {
+            min-width: 100%;
+        }
+    </style>
+    
+    <style>
+        .logout-link {
+            color: #dc3545;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 5px 10px;
+            border: 1px solid #dc3545;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        
+        .logout-link:hover {
+            background-color: #dc3545;
+            color: white;
+        }
+    </style>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add logout functionality for admin logout link
+            const adminLogoutLink = document.querySelector('.logout-link');
+            if (adminLogoutLink) {
+                adminLogoutLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    fetch('/admin-logout', {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            window.location.href = '/login';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error logging out:', error);
+                        window.location.href = '/login';
+                    });
+                });
+            }
+            // Add event listeners to all delete user buttons
+            const deleteUserButtons = document.querySelectorAll('.delete-user-btn');
+            
+            deleteUserButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const userId = this.getAttribute('data-user-id');
+                    const userName = this.getAttribute('data-user-name');
+                    
+                    if (confirm(`Are you sure you want to delete user "${userName}"? This action cannot be undone.`)) {
+                        fetch(`/admin/users/${userId}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.message) {
+                                alert(data.message);
+                                // Reload the page to update the user list
+                                location.reload();
+                            } else {
+                                alert(data.error || 'Error deleting user');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('An error occurred while deleting the user');
+                        });
+                    }
+                });
+            });
+            
+            // Add event listeners to all delete group buttons
+            const deleteGroupButtons = document.querySelectorAll('.delete-group-btn');
+            
+            deleteGroupButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const groupId = this.getAttribute('data-group-id');
+                    const groupName = this.getAttribute('data-group-name');
+                    
+                    if (confirm(`Are you sure you want to delete group "${groupName}"? This action cannot be undone.`)) {
+                        fetch(`/admin/groups/${groupId}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.message) {
+                                alert(data.message);
+                                // Reload the page to update the group list
+                                location.reload();
+                            } else {
+                                alert(data.error || 'Error deleting group');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('An error occurred while deleting the group');
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}

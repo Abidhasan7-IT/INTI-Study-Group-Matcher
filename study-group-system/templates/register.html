@@ -1,0 +1,70 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Register | INTI Study Group Matcher{% endblock %}
+
+{% block content %}
+    <div class="auth-container">
+        <h2>Create New Account</h2>
+        <div id="message" class="message"></div>
+        <form id="registerForm">
+            <label for="name">Full Name *</label>
+            <input type="text" id="name" name="name" required>
+            
+            <label for="student_id">Student ID *</label>
+            <input type="text" id="student_id" name="student_id" required>
+            
+            <label for="email">Email (Optional)</label>
+            <input type="email" id="email" name="email">
+            
+            <label for="password">Password *</label>
+            <input type="password" id="password" name="password" required>
+            
+            <button type="submit" class="btn">Register</button>
+        </form>
+        
+        <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+        
+        
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const studentId = document.getElementById('student_id').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            fetch('/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: name,
+                    student_id: studentId,
+                    email: email,
+                    password: password
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('message').innerHTML = '<p style="color: green;">Registration successful! You can now login.</p>';
+                    // Redirect to login page after a short delay
+                    setTimeout(() => {
+                        window.location.href = '/login';
+                    }, 2000);
+                } else {
+                    document.getElementById('message').innerHTML = '<p style="color: red;">' + data.message + '</p>';
+                }
+            })
+            .catch(error => {
+                document.getElementById('message').innerHTML = '<p style="color: red;">An error occurred. Please try again.</p>';
+            });
+        });
+    </script>
+{% endblock %}

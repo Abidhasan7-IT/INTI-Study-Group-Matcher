@@ -1,0 +1,52 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}My Groups | INTI{% endblock %}
+
+{% block content %}
+    <h2>My Groups List</h2>
+    <p>View and track the groups you've joined or created!</p>
+
+    <!-- Search section for all groups -->
+    <div class="search-section text-center">
+        <input type="text" id="searchJoinedGroups" placeholder="Search your groups...">
+        <button id="searchJoinedGroupsBtn" class="btn">🔍</button>
+        <button id="clearSearchBtn" class="btn">❌</button>
+    </div>
+
+    <div id="myGroupsList" class="groups-list">
+        <!-- Groups will appear here -->
+        <p>If you haven't joined or created any study groups yet, head to the "Find Group" page to join one or "Create Group" to start your own!</p>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/my-groups.js') }}"></script>
+    <style>
+        .group-card.created-group {
+            border-left: 4px solid #28a745; /* Green for created groups */
+        }
+        
+        .group-card.joined-group {
+            border-left: 4px solid #007bff; /* Blue for joined groups */
+        }
+        
+        .group-type {
+            font-size: 0.8em;
+            color: #6c757d;
+            font-weight: normal;
+        }
+        
+        .delete-group-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+        
+        .delete-group-btn:hover {
+            background-color: #c82333;
+        }
+    </style>
+{% endblock %}

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}INTI Study Group Matcher{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <!-- INTI Logo (centered, perfect size) -->
+        <a href="/"><img src="{{ url_for('static', filename='images/inti-logo.png') }}" alt="INTI University Logo" class="inti-logo"></a>
+        <h1>INTI Study Group Matcher</h1>
+        <nav>
+            <div class="nav-links">
+                <div id="user-links" class="nav-link-group">
+                    <a href="/" class="{% if request.path == '/' %}active{% endif %}">Home</a>
+                    <a href="{{ url_for('create_group') }}" class="{% if request.path == url_for('create_group') %}active{% endif %}">Create Group</a>
+                    <a href="{{ url_for('find_group') }}" class="{% if request.path == url_for('find_group') %}active{% endif %}">Find Group</a>
+                    <a href="{{ url_for('my_groups') }}" class="{% if request.path == url_for('my_groups') %}active{% endif %}">MyGroups</a>
+                </div>
+                <div id="admin-links" style="display: none;">
+                    <a href="{{ url_for('admin_dashboard') }}" class="{% if request.path == url_for('admin_dashboard') %}active{% endif %}">Admin Dashboard</a>
+                    <a href="{{ url_for('admin_users') }}" class="{% if request.path == url_for('admin_users') %}active{% endif %}">User List</a>
+                    <a href="{{ url_for('admin_groups') }}" class="{% if request.path == url_for('admin_groups') %}active{% endif %}">Group List</a>
+                </div>
+            </div>
+            <div id="user-menu" style="display: none;">
+                <span id="user-name"></span>
+                <button id="user-icon" class="user-icon-btn">👤</button>
+                <div id="user-dropdown" class="dropdown-content">
+                    <a href="#" id="logout-link">Logout</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+    
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    
+    {% block scripts %}{% endblock %}
+    
+    <script>
+        // Check if user is logged in and update UI accordingly
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/api/user')
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        // User not logged in, redirect to login if on protected page
+                        const protectedPages = ['/create-group', '/find-group', '/my-groups'];
+                        if (protectedPages.includes(window.location.pathname)) {
+                            window.location.href = '/login';
+                        }
+                        return null;
+                    }
+                })
+                .then(data => {
+                    if (data) {
+                        // User is logged in, show user menu
+                        document.getElementById('user-menu').style.display = 'flex';
+                        document.getElementById('user-name').textContent = data.name;
+                                            
+                        // Show admin links if user is admin, hide user links
+                        if (data.is_admin) {
+                            document.getElementById('admin-links').style.display = 'inline';
+                            // Hide user links if on admin dashboard page
+                            if (window.location.pathname === '/admin-dashboard') {
+                                document.getElementById('user-links').style.display = 'none';
+                            } else {
+                                document.getElementById('user-links').style.display = 'inline';
+                            }
+                        } else {
+                            // Show user links for regular users
+                            document.getElementById('user-links').style.display = 'inline';
+                        }
+                    } else {
+                        // User is not logged in, hide user menu and redirect if on protected page
+                        const protectedPages = ['/create-group', '/find-group', '/my-groups'];
+                        if (protectedPages.includes(window.location.pathname)) {
+                            window.location.href = '/login';
+                        }
+                                            
+                        // Show user links for non-logged-in users
+                        document.getElementById('user-links').style.display = 'inline';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking user status:', error);
+                    // If there's an error, assume user is not logged in
+                    const protectedPages = ['/create-group', '/find-group', '/my-groups'];
+                    if (protectedPages.includes(window.location.pathname)) {
+                        window.location.href = '/login';
+                    }
+                                    
+                    // Show user links for error case
+                    document.getElementById('user-links').style.display = 'inline';
+                });
+            
+            // Add event listener for user icon dropdown
+            const userIcon = document.getElementById('user-icon');
+            const dropdown = document.getElementById('user-dropdown');
+            
+            if (userIcon && dropdown) {
+                userIcon.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    dropdown.classList.toggle('show');
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!userIcon.contains(e.target) && !dropdown.contains(e.target)) {
+                        dropdown.classList.remove('show');
+                    }
+                });
+                
+                // Add logout functionality
+                document.getElementById('logout-link').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    fetch('/logout', {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                window.location.href = '/login';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error logging out:', error);
+                            window.location.href = '/login';
+                        });
+                });
+            }
+        });
+    </script>
+</body>
+</html>

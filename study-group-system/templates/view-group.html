@@ -1,0 +1,43 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Group Details{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Group Details</h1>
+    
+    {% if group %}
+        <div class="group-details">
+            <h2>{{ group.name }}</h2>
+            <p><strong>Subject:</strong> {{ group.subject }}</p>
+            <p><strong>Goal:</strong> {{ group.goal }}</p>
+            <p><strong>Description:</strong> {{ group.description }}</p>
+            <p><strong>Date:</strong> {{ group.date }}</p>
+            <p><strong>Time:</strong> {{ group.time }}</p>
+            <p><strong>Location:</strong> {{ group.location }}</p>
+            <p><strong>Max Members:</strong> {{ group.max_members }}</p>
+            <p><strong>Current Members:</strong> {{ group.current_members }}/{{ group.max_members }}</p>
+            <p><strong>Created by:</strong> {{ group.creator }}</p>
+        </div>
+        
+        <div class="group-members">
+            <h3>Group Members</h3>
+            {% if members %}
+                <ul>
+                {% for member in members %}
+                    <li>{{ member.name }} ({{ member.student_id }})</li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <p>No members in this group yet.</p>
+            {% endif %}
+        </div>
+        
+        <div class="group-actions">
+            <a href="{{ url_for('my_groups') }}" class="btn">Back to My Groups</a>
+        </div>
+    {% else %}
+        <p>Group not found.</p>
+    {% endif %}
+</div>
+{% endblock %}

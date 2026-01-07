@@ -1,0 +1,44 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Create Study Group | INTI{% endblock %}
+
+{% block content %}
+    <h2>Create a New Study Group</h2>
+        <form id="groupForm">
+            <label for="subject">Subject *</label>
+            <select id="subject" required>
+                <option value="">Select a subject</option>
+                <option value="math101">Math 101</option>
+                <option value="prog101">Programming Fundamentals</option>
+                <option value="bus101">Business Ethics</option>
+                <option value="stats101">Statistics 101</option>
+            </select>
+
+            <label for="goal">Study Goal *</label>
+            <select id="goal" required>
+                <option value="">Select a goal</option>
+                <option value="midterm">Midterm Review</option>
+                <option value="homework">Homework Help</option>
+                <option value="project">Project Discussion</option>
+                <option value="final">Final Exam Prep</option>
+            </select>
+
+            <label for="date">Date *</label>
+            <input type="date" id="date" required>
+
+            <label for="time">Time * (e.g., 6:00 PM - 8:00 PM)</label>
+            <input type="text" id="time" placeholder="6:00 PM - 8:00 PM" required>
+
+            <label for="location">Location * (e.g., Library 2nd Floor or Zoom Link)</label>
+            <input type="text" id="location" placeholder="Library 2nd Floor" required>
+
+            <label for="maxMembers">Max Members (Optional)</label>
+            <input type="number" id="maxMembers" min="2" max="10" placeholder="10">
+
+            <button type="submit" class="btn">Create Group</button>
+        </form>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/create.js') }}"></script>
+{% endblock %}

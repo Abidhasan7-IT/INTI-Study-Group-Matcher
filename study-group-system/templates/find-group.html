@@ -1,0 +1,52 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Find Study Groups | INTI{% endblock %}
+
+{% block content %}
+    <h2>Find Study Groups</h2>
+    <p>Join existing study groups based on your subjects and preferences!</p>
+
+    <!-- Filter section -->
+    <div class="filter-section">
+        <label for="filterSubject">Subject</label>
+        <select id="filterSubject">
+            <option value="all">All Subjects</option>
+            <!-- Options will be populated by JavaScript -->
+        </select>
+
+        <label for="filterGoal">Study Goal</label>
+        <select id="filterGoal">
+            <option value="all">All Goals</option>
+            <option value="midterm">Midterm Review</option>
+            <option value="homework">Homework Help</option>
+            <option value="project">Project Discussion</option>
+            <option value="final">Final Exam Prep</option>
+        </select>
+
+        <label for="filterDate">Date</label>
+        <select id="filterDate">
+            <option value="all">All Dates</option>
+            <option value="today">Today</option>
+            <option value="thisWeek">This Week</option>
+            <option value="nextWeek">Next Week</option>
+        </select>
+
+        <button id="filterBtn" class="btn">Apply Filters</button>
+    </div>
+
+    <!-- Groups List (will be populated by JavaScript) -->
+    <div id="groupsList" class="groups-list">
+        <!-- Groups will appear here! -->
+        <p>No groups found yet. Create a group first or check your filters.</p>
+    </div>
+
+    <!-- AI Recommendations Section (FIXED: Inside <main> and <body>) -->
+    <div id="ai-recommendations" style="margin-top: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 5px;">
+        <h3>All Recommended Study Groups</h3>
+        <div id="recommendation-list"></div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/find.js') }}"></script>
+{% endblock %}
